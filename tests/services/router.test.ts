@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createRouter } from '../../src/services/router';
+import { createServer } from '../../src/server';
 
 describe('router', () => {
   it('skips narration when policy disallows it', async () => {
@@ -22,5 +23,13 @@ describe('router', () => {
 
     expect(result.narration.shouldSpeak).toBe(false);
     expect(result.narration.text).toBe('');
+  });
+});
+
+describe('server', () => {
+  it('exposes a now endpoint', async () => {
+    const server = await createServer();
+    const response = await server.inject({ method: 'GET', url: '/api/now' });
+    expect(response.statusCode).toBe(200);
   });
 });
