@@ -15,6 +15,8 @@ import {
 } from './state/db';
 import { decideNarration } from './domain/narration-policy';
 
+import { config } from './config';
+
 function loadCatalog(): CatalogTrack[] {
   const raw = readFileSync(resolve(process.cwd(), 'data/seed-tracks.json'), 'utf-8');
   return JSON.parse(raw) as CatalogTrack[];
@@ -144,4 +146,11 @@ export async function createServer() {
   });
 
   return app;
+}
+
+// Start server when run directly
+if (process.argv[1]?.includes('server')) {
+  const app = await createServer();
+  await app.listen({ port: config.port });
+  console.log(`ai-radio-dj listening on http://localhost:${config.port}`);
 }
