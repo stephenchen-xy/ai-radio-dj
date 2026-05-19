@@ -22,5 +22,27 @@ export const seedCatalog: CatalogTrack[] = [
     era: '2010s',
     lyricsSnippet: 'I am giving you a night call',
     searchHint: 'Kavinsky Nightcall'
+  },
+  {
+    id: 'seed-focus-1',
+    title: 'Nuvole Bianche',
+    artist: 'Ludovico Einaudi',
+    genres: ['modern classical'],
+    moods: ['chill', 'focus'],
+    tags: ['focus', 'soft', 'afternoon'],
+    era: '2000s',
+    lyricsSnippet: '',
+    searchHint: 'Ludovico Einaudi Nuvole Bianche'
+  },
+  {
+    id: 'seed-gym-1',
+    title: 'Stronger',
+    artist: 'Kanye West',
+    genres: ['hip hop'],
+    moods: ['energy', 'push'],
+    tags: ['gym', 'push', 'morning'],
+    era: '2000s',
+    lyricsSnippet: "That that don't kill me can only make me stronger",
+    searchHint: 'Kanye West Stronger'
   }
 ];
