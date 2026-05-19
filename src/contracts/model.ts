@@ -1,19 +1,20 @@
 import { z } from 'zod';
 
-export const DominantDriverSchema = z.enum(['music', 'environment', 'request', 'mixed']);
-export const SteeringTypeSchema = z.enum(['soft', 'hard']);
-export const SteeringStatusSchema = z.enum(['new', 'continuing', 'decaying', 'expired', 'promoted']);
+const PlannedTrackSchema = z.object({
+  trackId: z.string().min(1),
+  title: z.string().min(1),
+  artist: z.string().min(1),
+  searchHint: z.string().min(1),
+  why: z.string().min(1)
+});
 
 export const ModelDecisionSchema = z.object({
   storyline: z.object({
     label: z.string().min(1),
     salientSignals: z.array(z.string()).min(1),
-    dominantDriver: DominantDriverSchema
+    dominantDriver: z.enum(['music', 'environment', 'request', 'mixed'])
   }),
-  play: z.array(z.object({
-    trackId: z.string().min(1),
-    why: z.string().min(1)
-  })).min(1),
+  play: z.array(PlannedTrackSchema).min(1).max(5),
   narration: z.object({
     shouldSpeak: z.boolean(),
     text: z.string(),
@@ -21,8 +22,8 @@ export const ModelDecisionSchema = z.object({
   }),
   steering: z.object({
     active: z.boolean(),
-    type: SteeringTypeSchema,
-    status: SteeringStatusSchema
+    type: z.enum(['soft', 'hard']),
+    status: z.enum(['new', 'continuing', 'decaying', 'expired', 'promoted'])
   })
 });
 
