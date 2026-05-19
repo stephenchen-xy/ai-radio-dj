@@ -1,6 +1,14 @@
 import Database from 'better-sqlite3';
 import type { StorylineState } from '../domain/storyline';
 
+export type PlannedSegmentState = {
+  storylineLabel: string;
+  dominantDriver: 'music' | 'environment' | 'request' | 'mixed';
+  steeringStatus?: 'new' | 'continuing' | 'decaying' | 'expired' | 'promoted';
+  narrationText: string;
+  tracksJson: string;
+};
+
 export function createInMemoryDb() {
   const db = new Database(':memory:');
   db.exec(`
@@ -11,6 +19,15 @@ export function createInMemoryDb() {
       dominant_driver text not null,
       confidence real not null,
       last_narration_at text
+    );
+
+    create table if not exists planned_segment (
+      id integer primary key check (id = 1),
+      storyline_label text not null,
+      dominant_driver text not null,
+      steering_status text,
+      narration_text text not null,
+      tracks_json text not null
     );
   `);
   return db;
@@ -54,5 +71,45 @@ export function loadStorylineState(db: Database.Database): StorylineState | unde
     dominantDriver: row.dominant_driver,
     confidence: row.confidence,
     lastNarrationAt: row.last_narration_at ?? undefined
+  };
+}
+
+export function savePlannedSegment(db: Database.Database, segment: PlannedSegmentState) {
+  db.prepare(`
+    insert into planned_segment (
+      id, storyline_label, dominant_driver, steering_status, narration_text, tracks_json
+    ) values (1, ?, ?, ?, ?, ?)
+    on conflict(id) do update set
+      storyline_label = excluded.storyline_label,
+      dominant_driver = excluded.dominant_driver,
+      steering_status = excluded.steering_status,
+      narration_text = excluded.narration_text,
+      tracks_json = excluded.tracks_json
+  `).run(
+    segment.storylineLabel,
+    segment.dominantDriver,
+    segment.steeringStatus ?? null,
+    segment.narrationText,
+    segment.tracksJson
+  );
+}
+
+export function loadPlannedSegment(db: Database.Database): PlannedSegmentState | undefined {
+  const row = db.prepare(`select * from planned_segment where id = 1`).get() as
+    | {
+        storyline_label: string;
+        dominant_driver: string;
+        steering_status: string | null;
+        narration_text: string;
+        tracks_json: string;
+      }
+    | undefined;
+  if (!row) return undefined;
+  return {
+    storylineLabel: row.storyline_label,
+    dominantDriver: row.dominant_driver as PlannedSegmentState['dominantDriver'],
+    steeringStatus: row.steering_status as PlannedSegmentState['steeringStatus'],
+    narrationText: row.narration_text,
+    tracksJson: row.tracks_json
   };
 }
